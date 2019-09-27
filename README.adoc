@@ -1,0 +1,530 @@
+
+= RadiusClient image:https://travis-ci.org/bpabdelkader/RadiusClient.svg?branch=master["Build Status", link="https://travis-ci.org/bpabdelkader/RadiusClient"] image:https://sonarcloud.io/api/project_badges/measure?project=bpabdelkader_RadiusClient&metric=alert_status["Quality Gate Status", link="https://sonarcloud.io/dashboard?id=bpabdelkader_RadiusClient"] image:https://jitpack.io/v/bpabdelkader/RadiusClient.svg["JitPack", link="https://jitpack.io/#bpabdelkader/RadiusClient"] 
+
+== Introduction
+==== RadiusClient is an Asynchrounous Scala library providing the means to send/receive Radius `Access` & `Accounting` Requests.
+{nbsp} +
+
+== Usage
+=== Example 1: Send `Access/Accounting` requests with Map settled attributes
+==== 1. Create Radius Client object
+The first step consists of creating a Radius Client instance to hold the communication with teh Radius Server.
+It requires the host name, shared secret of the Radius server and the calls reply Timeout value as well is in milliseconds.
+```scala
+val radiusClient = RadiusClient("140.27.30.40",
+    "mySharedSecret",
+    3000) // TimeOut in ms
+```
+
+==== 2. Attributes Map declaration
+The list of attributes is settled into an `scala.collection.immutable.Map`+
+
+Radius Standards and Vendor spcific(`GPP-SGSN-Address`, `3GPP-IMSI-MCC-MNC`) attriutes are supported
+
+```scala
+val accessRequestAttributes = Map(
+    "NAS-Identifier" -> "OPERATOR1",
+    "NAS-IP-Address" -> "10.11.12.13",
+    "Calling-Station-Id" -> "0123456789",
+    "NAS-Port" -> "1812",
+    "Framed-Protocol" -> "Gandalf-SLML"
+  )
+
+  val accountingRequestAttributes = Map(
+    "NAS-Identifier" -> "OPERATOR1",
+    "NAS-IP-Address" -> "10.11.12.13",
+    "Calling-Station-Id" -> "0123456789",
+    "Framed-IP-Address" -> "21.52.73.4"
+  )
+```
+
+==== 3. Send an `Authentication/ACCESS_REQUEST`
+Supported Authentication protocols : `CHAP` and `PAP`
+```scala
+radiusClient.authenticate(AccessRequest.CHAP, "login0001", "pass0001", accessRequestAttributes)
+```
+
+==== 4. Send `Accounting Requests`
+AccountingRequest type should be an `ACCOUNT_START`, `ACCOUNT_INTERIM`,  `ACCOUNT_STOP`, `ACCOUNT_ON` or `ACCOUNT_OFF`
+
+```scala
+// ACCOUNT_START
+radiusClient.account(AccountingRequest.ACCOUNT_START, "login0001", accountingRequestAttributes)
+
+// ACCOUNT_INTERIM
+radiusClient.account(AccountingRequest.ACCOUNT_INTERIM, "login0001", accountingRequestAttributes)
+
+// ACCOUNT_STOP
+radiusClient.account(AccountingRequest.ACCOUNT_STOP, "login0001", accountingRequestAttributes)
+       
+```
+
+==== 5. TestSuite1
+
+The above scenarios are grouped as Assertion tests in the scalatest Suite 1 `com.ngenia.radius.TestSuite1`
+
+```scala
+/*
+* Scala Radius Client
+* Created on 27/07/2019
+*
+* @author Bilal Pierre ABDELKADER
+* @version: 1.0.0
+*/
+
+package com.ngenia.radius
+
+import com.ngenia.radiusclient.client.RadiusClient
+import com.ngenia.radiusclient.packet._
+import org.scalatest.FunSuite
+import org.scalatest.Matchers._
+
+import scala.collection.immutable.Map
+
+class TestSuite1 extends FunSuite {
+
+  val radiusClient = RadiusClient("140.27.30.40",
+    "mySharedSecret",
+    3000) // TimeOut in ms
+
+  val accessRequestAttributes = Map(
+    "NAS-Identifier" -> "OPERATOR1",
+    "NAS-IP-Address" -> "10.11.12.13",
+    "Calling-Station-Id" -> "0123456789",
+    "NAS-Port" -> "1812",
+    "Framed-Protocol" -> "Gandalf-SLML"
+  )
+
+  val accountingRequestAttributes = Map(
+    "NAS-Identifier" -> "OPERATOR1",
+    "NAS-IP-Address" -> "10.11.12.13",
+    "Calling-Station-Id" -> "0123456789",
+    "Framed-IP-Address" -> "21.52.73.4"
+  )
+
+  test("Assert: Create Radius Client") {
+    radiusClient shouldBe a [RadiusClient]
+  }
+
+  test("Assert: Send [ACCESS_REQUEST] -> [ACCESS_ACCEPT]") {
+    assert(
+      radiusClient
+        .authenticate(AccessRequest.AUTH_CHAP, "login0001", "pass0001", accessRequestAttributes)
+        .get
+        .code eq RadiusPacket.ACCESS_ACCEPT)
+  }
+
+  test("Assert: Send [ACCOUNTING_START] -> [ACCOUNTING_RESPONSE]") {
+    assert(
+      radiusClient
+        .account(AccountingRequest.ACCOUNT_START, "login0001", accountingRequestAttributes)
+        .get
+        .code eq RadiusPacket.ACCOUNTING_RESPONSE)
+  }
+
+  test("Assert: Send [ACCOUNTING_INTERIM] -> [ACCOUNTING_RESPONSE]") {
+    assert(
+      radiusClient
+        .account(AccountingRequest.ACCOUNT_INTERIM, "login0001", accountingRequestAttributes)
+        .get
+        .code eq RadiusPacket.ACCOUNTING_RESPONSE)
+  }
+
+  test("Assert: Send [ACCOUNTING_STOP] -> [ACCOUNTING_RESPONSE]") {
+    assert(
+      radiusClient
+        .account(AccountingRequest.ACCOUNT_STOP, "login0001", accountingRequestAttributes)
+        .get
+        .code eq RadiusPacket.ACCOUNTING_RESPONSE)
+  }
+
+}
+```
+
+==== 6. Run `com.ngenia.radius.TestSuite1`
+
+```Ruby
+$ mvn test -Dsuites='com.ngenia.radius.TestSuite1'
+
+    [INFO] --- scalatest-maven-plugin:1.0:test (test) @ radius-client ---
+    Run starting. Expected test count is: 5
+    Test1:
+    
+    - Assert: Create Radius Client
+    
+    - Assert: Send [ACCESS_REQUEST] -> [ACCESS_ACCEPT]
+    ---------------- ----------------------- ----------------
+                          [Packet Sent]
+    ---------------- ----------------------- ----------------
+    Type: ACCESS_REQUEST
+    Identifier: 1
+    Authenticator: 0x7f2ababa423061c509f4923dd04b6cf1
+    Attributes:
+        User-Name: login0001
+        CHAP-Challenge: 0x027c59327bb735fa03fd9afc05a9a0b0
+        CHAP-Password: 0xe543a0f232e12902b9b525779a51218520
+        NAS-Identifier: OPERATOR1
+        NAS-IP-Address: 10.11.12.13
+        Calling-Station-Id: 0123456789
+        Framed-Protocol: Gandalf-SLML 
+        NAS-Port: 1812
+    ---------------- ----------------------- ----------------
+    [ScalaTest-main-running-Test1] INFO com.ngenia.radius.packet.AccessRequest - [Response Validation]: ACCESS_ACCEPT Authenticated Successfully
+    ---------------- ----------------------- ----------------
+                        [Packet Received]
+    ---------------- ----------------------- ----------------
+    Type: ACCESS_ACCEPT
+    Identifier: 1
+    Authenticator: 0xf87dc08272edc8cd29d0c12b8ae6416b
+    Attributes:
+        Vendor-Specific (529):
+          Ascend-Client-Primary-DNS: 11.112.113.44
+        Vendor-Specific (529):
+          Ascend-Client-Secondary-DNS: 11.112.113.45
+        Reply-Message: Cache last updated at Tue Aug 2019
+        Class: 0x32683966424f6431524d5456717830317
+        Framed-IP-Address: 21.52.73.4
+    ---------------- ----------------------- ----------------
+    
+    - Assert: Send [ACCOUNTING_START] -> [ACCOUNTING_RESPONSE]
+    ---------------- ----------------------- ----------------
+                          [Packet Sent]
+    ---------------- ----------------------- ----------------
+    Type: ACCOUNTING_REQUEST
+    Identifier: 2
+    Authenticator: 0xfe099f2c86766a6778596d002a24ec19
+    Attributes:
+        User-Name: login0001
+        Acct-Status-Type: 1
+        NAS-Identifier: OPERATOR1
+        NAS-IP-Address: 10.11.12.13
+        Calling-Station-Id: 0123456789
+        Framed-IP-Address: 21.52.73.4
+    ---------------- ----------------------- ----------------
+    [ScalaTest-main-running-Test1] INFO com.ngenia.radius.packet.AccountingRequest - [Response Validation]: ACCOUNTING_RESPONSE Authenticated Successfully
+    ---------------- ----------------------- ----------------
+                        [Packet Received]
+    ---------------- ----------------------- ----------------
+    Type: ACCOUNTING_RESPONSE
+    Identifier: 2
+    Authenticator: 0x295add65e784f1ea8b45b32758533a66
+    ---------------- ----------------------- ----------------
+    
+    - Assert: Send [ACCOUNTING_INTERIM] -> [ACCOUNTING_RESPONSE]
+    ---------------- ----------------------- ----------------
+                          [Packet Sent]
+    ---------------- ----------------------- ----------------
+    Type: ACCOUNTING_REQUEST
+    Identifier: 3
+    Authenticator: 0xf5f1db5ca1c4fd55eadb38c83409ac42
+    Attributes:
+        User-Name: login0001
+        Acct-Status-Type: 3
+        NAS-Identifier: OPERATOR1
+        NAS-IP-Address: 10.11.12.13
+        Calling-Station-Id: 0123456789
+        Framed-IP-Address: 21.52.73.4
+    ---------------- ----------------------- ----------------
+    [ScalaTest-main-running-Test1] INFO com.ngenia.radius.packet.AccountingRequest - [Response Validation]: ACCOUNTING_RESPONSE Authenticated Successfully
+    ---------------- ----------------------- ----------------
+                        [Packet Received]
+    ---------------- ----------------------- ----------------
+    Type: ACCOUNTING_RESPONSE
+    Identifier: 3
+    Authenticator: 0xff29e64b56ae80a88ce49509fc0f4a3a
+    ---------------- ----------------------- ----------------
+    
+    - Assert: Send [ACCOUNTING_STOP] -> [ACCOUNTING_RESPONSE]
+    ---------------- ----------------------- ----------------
+                          [Packet Sent]
+    ---------------- ----------------------- ----------------
+    Type: ACCOUNTING_REQUEST
+    Identifier: 4
+    Authenticator: 0x8e33c58a30479b9b6a18f96395a670e0
+    Attributes:
+        User-Name: login0001
+        Acct-Status-Type: 2
+        NAS-Identifier: OPERATOR1
+        NAS-IP-Address: 10.11.12.13
+        Calling-Station-Id: 0123456789
+        Framed-IP-Address: 21.52.73.4
+    ---------------- ----------------------- ----------------
+    [ScalaTest-main-running-Test1] INFO com.ngenia.radius.packet.AccountingRequest - [Response Validation]: ACCOUNTING_RESPONSE Authenticated Successfully
+    ---------------- ----------------------- ----------------
+                        [Packet Received]
+    ---------------- ----------------------- ----------------
+    Type: ACCOUNTING_RESPONSE
+    Identifier: 4
+    Authenticator: 0xf997c9db4d9fcbf13b5b53b73728477a
+    ---------------- ----------------------- ----------------
+    
+    Run completed in 468 milliseconds.
+    Total number of tests run: 5
+    Suites: completed 1, aborted 0
+    Tests: succeeded 5, failed 0, canceled 0, ignored 0, pending 0
+    All tests passed.
+    [INFO] ------------------------------------------------------------------------
+    [INFO] BUILD SUCCESS
+    [INFO] ------------------------------------------------------------------------
+    [INFO] Total time: 5.333 s
+    [INFO] Finished at: 2019-08-06T16:32:22+02:00
+    [INFO] Final Memory: 14M/981M
+    [INFO] ------------------------------------------------------------------------
+
+```
+{nbsp} +
+
+=== Example 2: Send `Access/Accounting` requests using the API
+
+==== 1. Create Radius Client object
+The first step consists of creating a Radius Client instance to hold the communication with teh Radius Server.+
+
+It requires the host name, shared secret of the Radius server and the calls reply Timeout value as well is in milliseconds.
+```scala
+val radiusClient = RadiusClient("140.27.30.40",
+    "mySharedSecret",
+    3000) // TimeOut in ms
+```
+
+==== 2. Attributes declaration
+A bundle of attributes could be always set in a `scala.collection.immutable.Map`. +
+In this example a part of the radius attributes will be set in a Map, the other set would be settled manually in the access and accounting requests objects 
+```scala
+val radiusAttributes = Map(
+    "3GPP-SGSN-Address" -> "1.2.3.4",
+    "3GPP-IMSI-MCC-MNC" -> "LAN"
+  )
+```
+
+==== 3. Create an `ACCESS_REQUEST` and Authenticate
+```scala
+val accessRequest = AccessRequest(AccessRequest.CHAP, "login0001", "pass0001", "mySharedSecret")
+
+// Add Vendor-Specific attributes as a MAP
+accessRequest.addAttributes(radiusAttributes)
+ 
+// Add Radius Attributes using the API
+accessRequest.addAttribute("NAS-Identifier", "OPERATOR1")
+accessRequest.addAttribute("NAS-IP-Address", "10.11.12.13")
+accessRequest.addAttribute("Calling-Station-Id", "0123456789")
+accessRequest.addAttribute("NAS-Port", "1812")
+
+val accessResponse: RadiusPacket = radiusClient.authenticate(accessRequest)
+// Response code should be a RadiusPacket of type ACCESS_ACCEPT
+accessResponse.code eq RadiusPacket.ACCESS_ACCEPT
+
+```
+
+==== 4. Create an `ACCOUNTING_REQUEST` and send an `ACCOUNT_START` packet
+AccountingRequest type should be an `ACCOUNT_START`, `ACCOUNT_INTERIM` or `ACCOUNTING_STOP`
+
+```scala
+val accountingRequest = AccountingRequest(AccountingRequest.ACCOUNT_START, "login0001")
+
+// Add Vendor-Specific attributes as a MAP
+accountingRequest.addAttributes(radiusAttributes)
+
+// Add Radius Attributes using the API
+accountingRequest.addAttribute("NAS-Identifier", "OPERATOR1")
+accountingRequest.addAttribute("NAS-IP-Address", "10.11.12.13")
+accountingRequest.addAttribute("Calling-Station-Id", "0123456789")
+accountingRequest.addAttribute("NAS-Port", "1813")
+accountingRequest.addAttribute("Framed-IP-Address", "21.52.73.4")
+
+val accountingResponse: RadiusPacket = radiusClient.account(accountingRequest)
+// Response code should be a RadiusPacket of type ACCOUNTING_RESPONSE
+accountingResponse.code eq RadiusPacket.ACCOUNTING_RESPONSE
+```
+
+==== 5. TestSuite2
+The above scenarios are grouped as Assertion tests in the scalatest Suite 2 `com.ngenia.radius.TestSuite2`
+```scala
+/*
+ * Scala Radius Client
+ * Created on 27/07/2019
+ *
+ * @author Bilal Pierre ABDELKADER
+ * @version: 1.0.0
+ */
+
+package com.ngenia.radius
+
+import com.ngenia.radiusclient.client.RadiusClient
+import com.ngenia.radiusclient.packet._
+import org.scalatest.FunSuite
+import org.scalatest.Matchers._
+
+import scala.collection.immutable.Map
+
+class TestSuite2 extends FunSuite {
+
+  val radiusClient = RadiusClient("140.27.30.40",
+    "mySharedSecret",
+    3000) // TimeOut in ms
+
+  val radiusAttributes = Map(
+    "3GPP-SGSN-Address" -> "1.2.3.4",
+    "3GPP-IMSI-MCC-MNC" -> "LAN"
+  )
+
+  test("Creating Radius Client") {
+    radiusClient shouldBe a[RadiusClient]
+  }
+
+  val accessRequest = AccessRequest(AccessRequest.AUTH_CHAP, "login0001", "pass0001", "mySharedSecret")
+  accessRequest.addAttributes(radiusAttributes)
+
+  accessRequest.addAttribute("NAS-Identifier", "OPERATOR1")
+  accessRequest.addAttribute("NAS-IP-Address", "10.11.12.13")
+  accessRequest.addAttribute("Calling-Station-Id", "0123456789")
+  accessRequest.addAttribute("NAS-Port", "1812")
+
+  test("Assert: Send [ACCESS_REQUEST] -> [ACCESS_ACCEPT]") {
+    assert(
+      radiusClient
+        .authenticate(accessRequest)
+        .get
+        .code eq RadiusPacket.ACCESS_ACCEPT
+    )
+  }
+
+  val accountingRequest = AccountingRequest(AccountingRequest.ACCOUNT_START, "login0001")
+  accountingRequest.addAttributes(radiusAttributes)
+
+  accountingRequest.addAttribute("NAS-Identifier", "OPERATOR1")
+  accountingRequest.addAttribute("NAS-IP-Address", "10.11.12.13")
+  accountingRequest.addAttribute("Calling-Station-Id", "0123456789")
+  accountingRequest.addAttribute("NAS-Port", "1813")
+  accountingRequest.addAttribute("Framed-IP-Address", "1.2.3.4")
+
+  test("Assert: Send [ACCOUNTING_START] -> [ACCOUNTING_RESPONSE]") {
+    assert(
+      radiusClient
+        .account(accountingRequest)
+        .get
+        .code eq RadiusPacket.ACCOUNTING_RESPONSE)
+  }
+```
+
+====  6. Run `com.ngenia.radius.TestSuite2`
+```Ruby
+$ mvn test -Dsuites='com.ngenia.radius.TestSuite2'
+
+    [INFO] --- scalatest-maven-plugin:1.0:test (test) @ radius-client ---
+    Run starting. Expected test count is: 3
+    Test2:
+    
+    - Creating Radius Client
+    
+    - Assert: Send [ACCESS_REQUEST] -> [ACCESS_ACCEPT]
+    ---------------- ----------------------- ----------------
+                          [Packet Sent]
+    ---------------- ----------------------- ----------------
+    Type: ACCESS_REQUEST
+    Identifier: 1
+    Authenticator: 0x7f2ababa423061c509f4923dd04b6cf1
+    Attributes:
+        User-Name: login0001
+        CHAP-Challenge: 0x4ffe3389d98d71ddbe8a57af662b46cc
+        CHAP-Password: 0x63769e1c1aa260a6302d803cd002047e68
+        Vendor-Specific (10415):
+          3GPP-SGSN-Address: 1.2.3.4
+        Vendor-Specific (10415):
+          3GPP-IMSI-MCC-MNC: LAN
+        NAS-Identifier: OPERATOR1
+        NAS-IP-Address: 10.11.12.13
+        Calling-Station-Id: 0123456789
+        NAS-Port: 1812
+    ---------------- ----------------------- ----------------
+    [ScalaTest-main-running-Test2] INFO com.ngenia.radius.packet.AccessRequest - [Response Validation]: ACCESS_ACCEPT Authenticated Successfully
+    ---------------- ----------------------- ----------------
+                        [Packet Received]
+    ---------------- ----------------------- ----------------
+    Type: ACCESS_ACCEPT
+    Identifier: 1
+    Authenticator: 0xf87dc08272edc8cd29d0c12b8ae6416b
+    Attributes:
+        Vendor-Specific (529):
+          Ascend-Client-Primary-DNS: 11.112.113.44
+        Vendor-Specific (529):
+          Ascend-Client-Secondary-DNS: 11.112.113.45
+        Reply-Message: Cache last updated at Tue Aug 2019
+        Class: 0x32683966424f6431524d5456717830
+        Framed-IP-Address: 1.2.3.4
+    ---------------- ----------------------- ----------------
+    
+    - Assert: Send [ACCOUNTING_START] -> [ACCOUNTING_RESPONSE]
+    ---------------- ----------------------- ----------------
+                          [Packet Sent]
+    ---------------- ----------------------- ----------------
+    Type: ACCOUNTING_REQUEST
+    Identifier: 2
+    Authenticator: 0x6ac7299e3a41d00ad346bb2cff1edffe
+    Attributes:
+        User-Name: login0001
+        Acct-Status-Type: 1
+        Vendor-Specific (10415):
+          3GPP-SGSN-Address: 1.2.3.4
+        Vendor-Specific (10415):
+          3GPP-IMSI-MCC-MNC: LAN
+        NAS-Identifier: OPERATOR1
+        NAS-IP-Address: 10.11.12.13
+        Calling-Station-Id: 0123456789
+        NAS-Port: 1813
+        Framed-IP-Address: 1.2.3.4
+    ---------------- ----------------------- ----------------
+    [ScalaTest-main-running-Test2] INFO com.ngenia.radius.packet.AccountingRequest - [Response Validation]: ACCOUNTING_RESPONSE Authenticated Successfully
+    ---------------- ----------------------- ----------------
+                        [Packet Received]
+    ---------------- ----------------------- ----------------
+    Type: ACCOUNTING_RESPONSE
+    Identifier: 2
+    Authenticator: 0xd323d6141c77402083fe4b0dc5865aa8
+    ---------------- ----------------------- ----------------
+    
+    Run completed in 462 milliseconds.
+    Total number of tests run: 3
+    Suites: completed 1, aborted 0
+    Tests: succeeded 3, failed 0, canceled 0, ignored 0, pending 0
+    All tests passed.
+    [INFO] ------------------------------------------------------------------------
+    [INFO] BUILD SUCCESS
+    [INFO] ------------------------------------------------------------------------
+    [INFO] Total time: 2.380 s
+    [INFO] Finished at: 2019-08-06T17:11:01+02:00
+    [INFO] Final Memory: 25M/981M
+    [INFO] ------------------------------------------------------------------------
+```
+{nbsp} +
+
+==  Run Tests
+Running the `mvn test` command generates a Surefire Report in \target\surefire-reports\TestSuite.txt =>
+
+```ruby
+
+$ mvn test
+    Discovery starting.
+    Discovery completed in 145 milliseconds.
+    Run starting. Expected test count is: 8
+    
+    TestSuite1:
+    - Assert: Create Radius Client (41 milliseconds)
+    - Assert: Send [ACCESS_REQUEST] -> [ACCESS_ACCEPT] (59 milliseconds)
+    - Assert: Send [ACCOUNTING_START] -> [ACCOUNTING_RESPONSE] (27 milliseconds)
+    - Assert: Send [ACCOUNTING_INTERIM] -> [ACCOUNTING_RESPONSE] (32 milliseconds)
+    - Assert: Send [ACCOUNTING_STOP] -> [ACCOUNTING_RESPONSE] (48 milliseconds)
+    
+    TestSuite2:
+    - Creating Radius Client (1 millisecond)
+    - Assert: Send [ACCESS_REQUEST] -> [ACCESS_ACCEPT] (20 milliseconds)
+    - Assert: Send [ACCOUNTING_START] -> [ACCOUNTING_RESPONSE] (21 milliseconds)
+    
+    Run completed in 480 milliseconds.
+    Total number of tests run: 8
+    Suites: completed 2, aborted 0
+    Tests: succeeded 8, failed 0, canceled 0, ignored 0, pending 0
+    All tests passed.
+```
+
+== License
+Released under the [LGPL License](https://www.gnu.org/licenses/lgpl-3.0.fr.html).
