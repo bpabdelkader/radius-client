@@ -5,7 +5,7 @@
     <artifactId>radius-client</artifactId>
     <name>radius-client</name>
     <description>Radius Client</description>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <developers>
         <developer>
