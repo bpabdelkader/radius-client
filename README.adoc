@@ -1,5 +1,5 @@
 
-= RadiusClient image:https://travis-ci.org/bpabdelkader/RadiusClient.svg?branch=master["Build Status", link="https://travis-ci.org/bpabdelkader/RadiusClient"] image:https://sonarcloud.io/api/project_badges/measure?project=bpabdelkader_RadiusClient&metric=alert_status["Quality Gate Status", link="https://sonarcloud.io/dashboard?id=bpabdelkader_RadiusClient"] image:https://jitpack.io/v/bpabdelkader/RadiusClient.svg["JitPack", link="https://jitpack.io/#bpabdelkader/RadiusClient"] 
+= RadiusClient image:https://travis-ci.org/bpabdelkader/radius-client.svg?branch=master["Build Status", link="https://travis-ci.org/bpabdelkader/radius-client"] image:https://sonarcloud.io/api/project_badges/measure?project=bpabdelkader_radius-client&metric=alert_status["Quality Gate Status", link="https://sonarcloud.io/dashboard?id=bpabdelkader_radius-client"] image:https://jitpack.io/v/bpabdelkader/radius-client.svg["JitPack", link="https://jitpack.io/#bpabdelkader/radius-client"] 
 
 == Introduction
 ==== RadiusClient is an Asynchrounous Scala library providing the means to send/receive Radius `Access` & `Accounting` Requests.

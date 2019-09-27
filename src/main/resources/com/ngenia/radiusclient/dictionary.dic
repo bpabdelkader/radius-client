@@ -1,0 +1,279 @@
+############################################################################################
+# Standard Radius Attributes                    								   		   #
+#                                               								   		   #
+# Name              				Code  								   Type    		   #
+############################################################################################
+User-Name                           1                                      String
+User-Password                       2                                      Bytes
+CHAP-Password                       3                                      Bytes
+NAS-IP-Address                      4                                      IPv4
+NAS-Port                            5                                      Integer
+Service-Type                        6                                      Integer
+Framed-Protocol                     7                                      Integer
+Framed-IP-Address                   8                                      IPv4
+Framed-IP-Netmask                   9                                      IPv4
+Framed-Routing                      10                                     Integer
+Filter-Id                           11                                     String
+Framed-MTU                          12                                     Integer
+Framed-Compression                  13                                     Integer
+Login-IP-Host                       14                                     IPv4
+Login-Service                       15                                     Integer
+Login-TCP-Port                      16                                     Integer
+Reply-Message                       18                                     String
+Callback-Number                     19                                     String
+Callback-Id                         20                                     String
+Framed-Route                        22                                     String
+Framed-IPX-Network                  23                                     IPv4
+State                               24                                     Bytes
+Class                               25                                     String
+Vendor-Specific                     26                                     Bytes
+Session-Timeout                     27                                     Integer
+Idle-Timeout                        28                                     Integer
+Termination-Action                  29                                     Integer
+Called-Station-Id                   30                                     String
+Calling-Station-Id                  31                                     String
+NAS-Identifier                      32                                     String
+Proxy-State                         33                                     Bytes
+Login-LAT-Service                   34                                     String
+Login-LAT-Node                      35                                     String
+Login-LAT-Group                     36                                     Bytes
+Framed-AppleTalk-Link               37                                     Integer
+Framed-AppleTalk-Network            38                                     Integer
+Framed-AppleTalk-Zone               39                                     String
+Acct-Status-Type                    40                                     Integer
+Acct-Delay-Time                     41                                     Integer
+Acct-Input-Octets                   42                                     Integer
+Acct-Output-Octets                  43                                     Integer
+Acct-Session-Id                     44                                     String
+Acct-Authentic                      45                                     Integer
+Acct-Session-Time                   46                                     Integer
+Acct-Input-Packets                  47                                     Integer
+Acct-Output-Packets                 48                                     Integer
+Acct-Terminate-Cause                49                                     Integer
+Acct-Multi-Session-Id               50                                     String
+Acct-Link-Count                     51                                     Integer
+Acct-Input-Gigawords                52                                     Integer
+Acct-Output-Gigawords               53                                     Integer
+Event-Timestamp                     55                                     Date
+CHAP-Challenge                      60                                     Bytes
+NAS-Port-Type                       61                                     Integer
+Port-Limit                          62                                     Integer
+Login-LAT-Port                      63                                     Integer
+Acct-Tunnel-Connection              68                                     String
+ARAP-Password                       70                                     String
+ARAP-Features                       71                                     String
+ARAP-Zone-Access                    72                                     Integer
+ARAP-Security                       73                                     Integer
+ARAP-Security-Data                  74                                     String
+Password-Retry                      75                                     Integer
+Prompt                              76                                     Integer
+Connect-Info                        77                                     String
+Configuration-Token                 78                                     String
+EAP-Message                         79                                     Bytes
+Message-Authenticator               80                                     Bytes
+ARAP-Challenge-Response             84                                     String
+Acct-Interim-Interval               85                                     Integer
+NAS-Port-Id                         87                                     String
+Framed-Pool                         88                                     String
+NAS-IPv6-Address                    95                                     IPv6
+Framed-Interface-Id                 96                                     Bytes
+Framed-IPv6-Prefix                  97                                     ipv6prefix
+Login-IPv6-Host                     98                                     Bytes
+Framed-IPv6-Route                   99                                     String
+Framed-IPv6-Pool                    100                                    String
+Error-Cause                         101                                    Integer
+Delegated-Ipv6-Prefix               123                                    IPv6
+Framed-IPv6-Address                 168                                    IPv6
+DNS-Server-IPv6-Address             169                                    IPv6
+Route-IPv6-Information              170                                    Bytes
+Delegated-IPv6-Prefix-Pool          171                                    String
+Stateful-IPv6-Address-Pool          172                                    String
+Digest-Response                     206                                    String
+Digest-Attributes                   207                                    Bytes
+
+############################################################################################
+# Attributes Constant Values                     								   		   #
+#                                               								   		   #
+# Name              				Value  								   Code            #
+############################################################################################
+
+# Framed Protocols
+
+Framed-Protocol                     PPP                                    1
+Framed-Protocol                     SLIP                                   2
+Framed-Protocol                     ARAP                                   3
+Framed-Protocol                     Gandalf-SLML                           4
+Framed-Protocol                     Xylogics-IPX-SLIP                      5
+Framed-Protocol                     X.75-Synchronous                       6
+Framed-Protocol                     GPRS-PDP-Context                       7
+
+# User Types
+
+Service-Type                        Login-User                             1
+Service-Type                        Framed-User                            2
+Service-Type                        Callback-Login-User                    3
+Service-Type                        Callback-Framed-User                   4
+Service-Type                        Outbound-User                          5
+Service-Type                        Administrative-User                    6
+Service-Type                        NAS-Prompt-User                        7
+Service-Type                        Authenticate-Only                      8
+Service-Type                        Callback-NAS-Prompt                    9
+Service-Type                        Call-Check                             10
+Service-Type                        Callback-Administrative                11
+Service-Type                        Voice                                  12
+Service-Type                        Fax                                    13
+Service-Type                        Modem-Relay                            14
+Service-Type                        IAPP-Register                          15
+Service-Type                        IAPP-AP-Check                          16
+
+#FramedRoutingValues
+
+Framed-Routing                      None                                   0
+Framed-Routing                      Broadcast                              1
+Framed-Routing                      Listen                                 2
+Framed-Routing                      Broadcast-Listen                       3
+
+#FramedCompressionTypes
+
+Framed-Compression                  None                                   0
+Framed-Compression                  Van-Jacobson-TCP-IP                    1
+Framed-Compression                  IPX-Header-Compression                 2
+Framed-Compression                  Stac-LZS                               3
+
+#LoginServices
+
+Login-Service                       Telnet                                 0
+Login-Service                       Rlogin                                 1
+Login-Service                       TCP-Clear                              2
+Login-Service                       PortMaster                             3
+Login-Service                       LAT                                    4
+Login-Service                       X25-PAD                                5
+Login-Service                       X25-T3POS                              6
+Login-Service                       TCP-Clear-Quiet                        7
+
+# Status Types
+
+Acct-Status-Type                    Start								   1
+Acct-Status-Type                    Stop                                   2
+Acct-Status-Type                    Interim-Update                         3
+Acct-Status-Type                    Alive                                  3
+Acct-Status-Type                    Accounting-On                          7
+Acct-Status-Type                    Accounting-Off                         8
+Acct-Status-Type                    Tunnel-Start                           9
+Acct-Status-Type                    Tunnel-Stop                            10
+Acct-Status-Type                    Tunnel-Reject                          11
+Acct-Status-Type                    Tunnel-Link-Start                      12
+Acct-Status-Type                    Tunnel-Link-Stop                       13
+Acct-Status-Type                    Tunnel-Link-Reject                     14
+Acct-Status-Type                    Failed                                 15
+
+# Authentication Types
+
+Acct-Authentic                      RADIUS                                 1
+Acct-Authentic                      Local                                  2
+Acct-Authentic                      Remote                                 3
+Acct-Authentic                      Diameter                               4
+
+# Termination Options
+
+Termination-Action                  Default                                0
+Termination-Action                  RADIUS-Request                         1
+
+# NAS Port Types
+
+NAS-Port-Type                       Async                                  0
+NAS-Port-Type                       Sync                                   1
+NAS-Port-Type                       ISDN                                   2
+NAS-Port-Type                       ISDN-V120                              3
+NAS-Port-Type                       ISDN-V110                              4
+NAS-Port-Type                       Virtual                                5
+NAS-Port-Type                       PIAFS                                  6
+NAS-Port-Type                       HDLC-Clear-Channel                     7
+NAS-Port-Type                       X.25                                   8
+NAS-Port-Type                       X.75                                   9
+NAS-Port-Type                       G.3-Fax                                10
+NAS-Port-Type                       SDSL                                   11
+NAS-Port-Type                       ADSL-CAP                               12
+NAS-Port-Type                       ADSL-DMT                               13
+NAS-Port-Type                       IDSL                                   14
+NAS-Port-Type                       Ethernet                               15
+NAS-Port-Type                       xDSL                                   16
+NAS-Port-Type                       Cable                                  17
+NAS-Port-Type                       Wireless-Other                         18
+NAS-Port-Type                       Wireless-802.11                        19
+NAS-Port-Type                       Token-Ring                             20
+NAS-Port-Type                       FDDI                                   21
+NAS-Port-Type                       Wireless-CDMA2000                      22
+NAS-Port-Type                       Wireless-UMTS                          23
+NAS-Port-Type                       Wireless-1X-EV                         24
+NAS-Port-Type                       IAPP                                   25
+
+# Accounting Terminate Causes
+
+Acct-Terminate-Cause                User-Request                           1
+Acct-Terminate-Cause                Lost-Carrier                           2
+Acct-Terminate-Cause                Lost-Service                           3
+Acct-Terminate-Cause                Idle-Timeout                           4
+Acct-Terminate-Cause                Session-Timeout                        5
+Acct-Terminate-Cause                Admin-Reset                            6
+Acct-Terminate-Cause                Admin-Reboot                           7
+Acct-Terminate-Cause                Port-Error                             8
+Acct-Terminate-Cause                NAS-Error                              9
+Acct-Terminate-Cause                NAS-Request                            10
+Acct-Terminate-Cause                NAS-Reboot                             11
+Acct-Terminate-Cause                Port-Unneeded                          12
+Acct-Terminate-Cause                Port-Preempted                         13
+Acct-Terminate-Cause                Port-Suspended                         14
+Acct-Terminate-Cause                Service-Unavailable                    15
+Acct-Terminate-Cause                Callback                               16
+Acct-Terminate-Cause                User-Error                             17
+Acct-Terminate-Cause                Host-Request                           18
+Acct-Terminate-Cause                Supplicant-Restart                     19
+Acct-Terminate-Cause                Reauthentication-Failure               20
+Acct-Terminate-Cause                Port-Reinit                            21
+Acct-Terminate-Cause                Port-Disabled                          22
+
+# Prompt
+
+Prompt                              No-Echo                                0
+Prompt                              Echo                                   1
+
+# Error-Cause
+
+Error-Cause                         Residual-Context-Removed               201
+Error-Cause                         Invalid-EAP-Packet                     202
+Error-Cause                         Unsupported-Attribute                  401
+Error-Cause                         Missing-Attribute                      402
+Error-Cause                         NAS-Identification-Mismatch            403
+Error-Cause                         Invalid-Request                        404
+Error-Cause                         Unsupported-Service                    405
+Error-Cause                         Unsupported-Extension                  406
+Error-Cause                         Invalid-Attribute-Value                407
+Error-Cause                         Administratively-Prohibited            501
+Error-Cause                         Proxy-Request-Not-Routable             502
+Error-Cause                         Session-Context-Not-Found              503
+Error-Cause                         Session-Context-Not-Removable          504
+Error-Cause                         Proxy-Processing-Error                 505
+Error-Cause                         Resources-Unavailable                  506
+Error-Cause                         Request-Initiated                      507
+Error-Cause                         Multiple-Session-Selection-Unsupported 508
+Error-Cause                         Location-Info-Required                 509
+Error-Cause                         Response-Too-Big                       601
+
+############################################################################################
+# Vendor-Specific Attributes                    								   		   #
+#                                               								   		   #
+# VendorId  						Name 			       		    	   Code    	  Type #
+############################################################################################
+
+10415                               3GPP-SGSN-Address                      6          IPv4
+10415                               3GPP-GGSN-Address                      7          IPv4
+10415                               3GPP-IMSI-MCC-MNC                      8          String
+10415                               3GPP-RAT-Type                          21         Byte
+10415                               3GPP-Location-Info                     22         Bytes
+
+311                                 MS-Primary-DNS-Server                  28         IPv4
+311                                 MS-Secondary-DNS-Server                29         IPv4
+
+529                                 Ascend-Client-Primary-DNS              135        IPv4
+529                                 Ascend-Client-Secondary-DNS            136        IPv4
